@@ -162,6 +162,12 @@ IniFile IniFile::from_file(std::string file) {
     ret.sections.push_back(IniSection("Main"));
     int current_section = 0;
     std::string rd = read(file);
+    if(is_empty(rd)) {
+        ret.err = IniError::READ_ERROR; 
+        ret.err_desc = "Empty file\n";
+        return ret;
+    }
+
     auto lines = to_lines(rd);
 
     for(size_t i = 0; i < lines.size(); ++i) {
@@ -173,7 +179,7 @@ IniFile IniFile::from_file(std::string file) {
                 bool found = false;
                 for(size_t j = 0; j < ret.sections.size(); ++j) {
                     if(ret.sections[j].name == section) {
-                        current_section = j; // warning!
+                        current_section = j;
                         found = true;
                         break;
                     }
@@ -218,6 +224,11 @@ IniFile IniFile::from_file(std::string file) {
                 ret.sections[current_section].members.push_back(IniPair(left,IniHelper::to_element(right)));
             }
         }
+    }
+
+    if(ret.sections.size() == 0) {
+        ret.err = IniError::READ_ERROR; 
+        ret.err_desc = "No sections found!\n";
     }
     return ret;
 }
@@ -519,7 +530,9 @@ std::string IniHelper::to_string(IniList list) {
     for(auto i : list) {
         ret += i.to_string() + ",";
     }
-    ret.pop_back();
+    if(list.size() != 0) {
+        ret.pop_back();
+    }
     ret += ']';
     return ret;
 }
