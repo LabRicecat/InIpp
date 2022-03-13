@@ -87,3 +87,16 @@ int main() {
     file.to_file("test.inipp");
 }
 ```
+
+### Inipp itself
+```ini
+[Section]
+key=value
+other_key="string value"
+float=67.2456
+
+[Section2]
+list=[element1,"element2",2744]
+dict={key:value,wow:["such","cool"]}
+vector3=(1,23,456)
+```
