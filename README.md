@@ -1,5 +1,6 @@
 # InIpp
-Ini++ (Or InIpp) is just normal InI, but with changes and additions
+Ini++ (Or InIpp) is just normal InI, but with changes and additions. <br>
+This implemention is written in C++.
 
 # Syntax
 Ini++ is very much the same as Ini, but with some changes:
@@ -50,7 +51,7 @@ Floats are not yet supported. <br>
 `IniVector` is defined as `struct IniVector { ... };`
 
 ## How to use
-An example:
+An example: (C++)
 ```c++
 #include <iostream>
 #include <fstream>
