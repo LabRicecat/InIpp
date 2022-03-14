@@ -14,7 +14,7 @@ Known types are:
  - Float
  - Vector
  - List
- - Dictionary
+ - Dictionary <br>
 As defined in `IniTypes`.
 <br>
 These types will be checked for the user. <br>
