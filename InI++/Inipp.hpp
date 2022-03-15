@@ -107,9 +107,7 @@ public:
     operator IniList();
     operator IniVector();
     operator IniDictionary();
-
     
-
 };
 
 enum class IniError {
@@ -171,7 +169,7 @@ public:
     void set(std::string key, IniElement value, std::string section = "Main");
     void set(std::string key, IniList value, std::string section = "Main");
     void set(std::string key, IniDictionary value, std::string section = "Main");
-
+    void set(std::string key, IniVector value, std::string section = "Main");
 
     IniFile(std::string file) {
         operator=(from_file(file));

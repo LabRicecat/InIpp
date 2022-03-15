@@ -2,8 +2,30 @@
 Ini++ (Or InIpp) is just normal InI, but with changes and additions
 
 # Syntax
-Ini++ is very much the same as Ini, but with some changes:
 
+## Sections
+Every value has to be in a section. <br>
+A section is defined as this:
+```
+[SectionName]
+```
+Spaces are supported, but not recomended! <br>
+Now the key-value pairs can be added:
+```
+[Section]
+key="value"
+int=1245
+float=6.27
+...
+```
+When pairs are not in a section, like this:
+```
+a="b"
+[Section]
+...
+```
+they will be merged to the "Main" section at the top, once the file has been written. <br>
+It is possible to open a section more then once!
 ## Types
 Every value of a key has a type. <br>
 Known types are:
@@ -13,11 +35,18 @@ Known types are:
  - Float
  - Vector
  - List
- - Dictionary
+ - Dictionary <br>
 As defined in `IniTypes`.
 <br>
 These types will be checked for the user. <br>
-
+<br>
+<br>
+Warning! something like:
+```ini
+[Section]
+a=b
+```
+won't work, because `b` is not a known type. It should be `"b"`!
 ### Element
 As defined in the `IniElement` class, it's a storage class for every known type.
 
@@ -59,29 +88,32 @@ An example:
 int main() {
 
     IniFile file = IniFile::from_file("test.inipp");
+    
     if(!file) {
         std::cout << file.error_msg() << "\n"; // An error occured!
         return 1;
     }
+    
     IniVector vector = file.get("vector","section_a").to_vector(); // file.get() returns an IniElement
-
+    
     std::cout << vector.x << " | " << vector.y << " | " << vector.z << "\n"; // Prints the vector
 
     vector.x += 10; // modifies the vector
 
-    file.set("vector",IniElement(IniType::Vector,vector.to_string()),"section_a"); // apply changes
+    file.set("vector",vector,"section_a"); // apply changes
 
-    vector = file.get("vector","section_a").to_vector(); // gets the new vector
+    vector = file.get("vector","section_a"); // gets the new vector
 
-    IniList list = file.get("list","section_b").to_list(); // if these function fail, they'll return an empty instance
-    IniDictionary dictionary = file.get("dictionary","section_b").to_dictionary();
+    IniList list = file.get("list","section_b"); // if not a list, returns empty list and sets error()
+    IniDictionary dictionary = file.get("dictionary","section_b"); // if not a dictionary, returns empty dictionary and sets error()
 
-    dictionary["key"] = list.front(); // sets key to the first element in the list
+    dictionary["key"] = list.back(); // sets key to the last element in the list
     list.pop_back(); // deletes the last element
 
+    
     // writes everything back
-    file.set("list",IniElement(IniType::List,IniHelper::to_string(list)),"section_b");
-    file.set("list",IniElement(IniType::List,IniHelper::to_string(dictionary)),"section_b");
+    file.set("list",list,"section_b");
+    file.set("dictionary",dictionary,"section_b");
 
     // write back to file
     file.to_file("test.inipp");
@@ -91,12 +123,12 @@ int main() {
 ### Inipp itself
 ```ini
 [Section]
-key=value
+key="value"
 other_key="string value"
 float=67.2456
 
 [Section2]
-list=[element1,"element2",2744]
-dict={key:value,wow:["such","cool"]}
+list=["element1","element2",2744]
+dict={key:"value",wow:["such","cool"]}
 vector3=(1,23,456)
 ```

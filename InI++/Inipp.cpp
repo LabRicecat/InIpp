@@ -312,6 +312,10 @@ void IniFile::set(std::string key, IniDictionary value, std::string section = "M
     IniFile::set(key,IniElement(IniType::Dictionary,IniHelper::to_string(value)),section);
 }
 
+void IniFile::set(std::string key, IniVector value, std::string section = "Main") {
+    IniFile::set(key,IniElement(IniType::Vector,IniHelper::to_string(value)),section);
+}
+
 // IniSection
 
 
