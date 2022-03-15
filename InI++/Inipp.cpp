@@ -249,6 +249,9 @@ std::string IniFile::error_msg() const {
 }
 
 IniElement& IniFile::get(std::string key, std::string sec) {
+    if(sec == "") {
+        sec = "Main";
+    }
     if(!has_section(sec)) {
         err = IniError::READ_ERROR;
         err_desc = "Unable to get not existing variable: " + key + " in not existing section " + sec + " !";
@@ -354,6 +357,19 @@ IniDictionary IniElement::to_dictionary() const {
     return IniHelper::to_dictionary(src);
 }
 
+IniElement IniElement::from_vector(IniVector vec) {
+    return IniElement(IniType::Vector,vec.to_string());
+}
+
+IniElement IniElement::from_list(IniList list) {
+    return IniElement(IniType::List,IniHelper::to_string(list));
+}
+
+IniElement IniElement::from_dictionary(IniDictionary dictionary) {
+    return IniElement(IniType::Dictionary,IniHelper::to_string(dictionary));
+}
+
+
 // IniHelper namespace
 
 std::vector<std::string> IniHelper::tls::split_by(std::string str,std::vector<char> erase, std::vector<char> keep, std::vector<char> extract, bool ignore_in_braces, bool delete_empty) {
@@ -403,8 +419,32 @@ std::vector<std::string> IniHelper::tls::split_by(std::string str,std::vector<ch
     return ret;
 }
 
-void IniHelper::reset_type(IniElement& obj) { // does not what i want it to do
-    obj = IniElement(IniType::Null,"NULL");
+void IniHelper::set_type(IniElement& obj, IniType type) {
+    switch(type) {
+        case IniType::Int:
+            obj = IniElement(type,"0");
+        break;
+        case IniType::Float:
+            obj = IniElement(type,"0.0");
+        break;
+        case IniType::String:
+            obj = IniElement(type,"\"\"");
+        break;
+        case IniType::Null:
+            obj = IniElement(type,"NULL");
+        break;
+        case IniType::List:
+            obj = IniElement(type,"[]");
+        break;
+        case IniType::Dictionary:
+            obj = IniElement(type,"{}");
+        break;
+        case IniType::Vector:
+            obj = IniElement(type,"(0,0,0)");
+        break;
+        default:
+            obj = IniElement(type,"NULL");
+    }
 }
 
 IniDictionary IniHelper::to_dictionary(std::string source) {
@@ -545,4 +585,8 @@ std::string IniHelper::to_string(IniDictionary dictionary) {
     ret.pop_back();
     ret += '}';
     return ret;
+}
+
+std::string IniHelper::to_string(IniVector vector) {
+    return vector.to_string();
 }

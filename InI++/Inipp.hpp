@@ -41,7 +41,7 @@ struct IniVector        IS_INI_TYPE
 };
 
 namespace IniHelper {
-    void reset_type(IniElement& obj);
+    void set_type(IniElement& obj, IniType type);
 
     // @exception will return IniDictionary()
     IniDictionary to_dictionary(std::string source);
@@ -70,6 +70,7 @@ namespace IniHelper {
 
     std::string to_string(IniList list);
     std::string to_string(IniDictionary dictionary);
+    std::string to_string(IniVector vector);
 }
 
 class IniElement {
@@ -93,6 +94,10 @@ public:
     IniVector to_vector() const;
     IniList to_list() const;
     IniDictionary to_dictionary() const;
+
+    static IniElement from_vector(IniVector vec);
+    static IniElement from_list(IniList list);
+    static IniElement from_dictionary(IniDictionary dictionary);
 };
 
 enum class IniError {
