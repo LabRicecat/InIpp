@@ -31,6 +31,7 @@ using IniList           IS_INI_TYPE  =  std::vector<IniElement>;
 struct IniVector        IS_INI_TYPE 
 { // Vector3, not std::vector
     int x = 0,y = 0,z = 0;
+
     void operator=(IniVector v) {
         x = v.x;
         y = v.y;
@@ -98,6 +99,17 @@ public:
     static IniElement from_vector(IniVector vec);
     static IniElement from_list(IniList list);
     static IniElement from_dictionary(IniDictionary dictionary);
+
+    IniElement operator=(IniList list);
+    IniElement operator=(IniVector vector);
+    IniElement operator=(IniDictionary dictionary);
+
+    operator IniList();
+    operator IniVector();
+    operator IniDictionary();
+
+    
+
 };
 
 enum class IniError {
@@ -157,6 +169,9 @@ public:
     IniSection& section(std::string name);
 
     void set(std::string key, IniElement value, std::string section = "Main");
+    void set(std::string key, IniList value, std::string section = "Main");
+    void set(std::string key, IniDictionary value, std::string section = "Main");
+
 
     IniFile(std::string file) {
         operator=(from_file(file));

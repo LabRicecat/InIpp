@@ -304,6 +304,14 @@ void IniFile::set(std::string key, IniElement value, std::string sec) {
     return;
 }
 
+void IniFile::set(std::string key, IniList value, std::string section = "Main") {
+    IniFile::set(key,IniElement(IniType::List,IniHelper::to_string(value)),section);
+}
+
+void IniFile::set(std::string key, IniDictionary value, std::string section = "Main") {
+    IniFile::set(key,IniElement(IniType::Dictionary,IniHelper::to_string(value)),section);
+}
+
 // IniSection
 
 
@@ -369,6 +377,32 @@ IniElement IniElement::from_dictionary(IniDictionary dictionary) {
     return IniElement(IniType::Dictionary,IniHelper::to_string(dictionary));
 }
 
+IniElement IniElement::operator=(IniList list) {
+    src = IniHelper::to_string(list);
+    return *this;
+}
+
+IniElement IniElement::operator=(IniVector vector) {
+    src = IniHelper::to_string(vector);
+    return *this;
+}
+
+IniElement IniElement::operator=(IniDictionary dictionary) {
+    src = IniHelper::to_string(dictionary);
+    return *this;
+}
+
+IniElement::operator IniList() {
+    return IniHelper::to_list(src);
+}
+
+IniElement::operator IniVector() {
+    return IniHelper::to_vector(src);
+}
+
+IniElement::operator IniDictionary() {
+    return IniHelper::to_dictionary(src);
+}
 
 // IniHelper namespace
 
