@@ -64,6 +64,9 @@ static bool all_numbers(std::string str, bool& dot) {
 
 static bool br_check(std::string str, char open, char close) {
     int br_count = 0;
+    if(str.size() < 2) {
+        return false;
+    }
     for(size_t i = 0; i < str.size(); ++i) {
         if(str[i] == open) {
             ++br_count;
@@ -76,7 +79,10 @@ static bool br_check(std::string str, char open, char close) {
             return false;
         }
     }
-    return true;
+    if(br_count == 0) {
+        return true;
+    }
+    return false;
 }
 
 static std::vector<std::string> to_lines(std::string src) {
@@ -304,15 +310,15 @@ void IniFile::set(std::string key, IniElement value, std::string sec) {
     return;
 }
 
-void IniFile::set(std::string key, IniList value, std::string section = "Main") {
+void IniFile::set(std::string key, IniList value, std::string section) {
     IniFile::set(key,IniElement(IniType::List,IniHelper::to_string(value)),section);
 }
 
-void IniFile::set(std::string key, IniDictionary value, std::string section = "Main") {
+void IniFile::set(std::string key, IniDictionary value, std::string section) {
     IniFile::set(key,IniElement(IniType::Dictionary,IniHelper::to_string(value)),section);
 }
 
-void IniFile::set(std::string key, IniVector value, std::string section = "Main") {
+void IniFile::set(std::string key, IniVector value, std::string section) {
     IniFile::set(key,IniElement(IniType::Vector,IniHelper::to_string(value)),section);
 }
 
@@ -406,6 +412,21 @@ IniElement::operator IniVector() {
 
 IniElement::operator IniDictionary() {
     return IniHelper::to_dictionary(src);
+}
+
+IniElement::operator std::string() {
+    return src;
+}
+
+std::ostream& operator<<(std::ostream& os, IniElement element) {
+    std::string pr = element.to_string();
+    if(element.getType() == IniType::String) {
+        pr.erase(pr.begin());
+        pr.pop_back();
+    }
+    
+    os << pr;
+    return os;
 }
 
 // IniHelper namespace
@@ -598,6 +619,17 @@ IniElement IniHelper::to_element(std::string source) {
         return IniElement(IniType::Vector,source);
     }
 
+    bool has = false;
+    for(auto i : source) {
+        if(i == '\"') {
+            has = true;
+            break;
+        }
+    }
+
+    if(!has) { // converts it to string non' the less
+        return IniElement(IniType::String,"\""+source+"\"");
+    }
 
     return IniElement();
 }

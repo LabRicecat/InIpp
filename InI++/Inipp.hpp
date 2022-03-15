@@ -107,8 +107,10 @@ public:
     operator IniList();
     operator IniVector();
     operator IniDictionary();
-    
+    operator std::string();
 };
+
+std::ostream &operator<<(std::ostream& os, IniElement element);   
 
 enum class IniError {
     OK,
