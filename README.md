@@ -47,7 +47,9 @@ Warning! something like:
 [Section]
 a=b
 ```
-won't work, because `b` is not a known type. It should be `"b"`!
+shoudln't work, because `b` is not a known type. It should be `"b"`! <br>
+Luckily, Ini++ already handles this case for you. <br>
+`b` would be turned to `"b"`. But be careful! `1` will always be an `int`, even when it was intended to be a string!
 ### Element
 As defined in the `IniElement` class, it's a storage class for every known type.
 
