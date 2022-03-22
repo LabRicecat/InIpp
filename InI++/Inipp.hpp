@@ -124,7 +124,7 @@ struct IniPair {
     IniElement element = IniElement(IniType::Null);
 
     IniPair() {}
-    IniPair(std::string key) {}
+    IniPair(std::string key) : key(key) {}
     IniPair(std::string key, IniElement element)
         : key(key), element(element) {}
     //IniPair(IniPair& pair)

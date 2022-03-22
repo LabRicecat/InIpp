@@ -255,13 +255,19 @@ std::string IniFile::error_msg() const {
 }
 
 IniElement& IniFile::get(std::string key, std::string sec) {
+    IniElement invalid_ref;
+    IniElement& err_ret = invalid_ref;
+    if(!sections.empty() && !sections.front().members.empty()) {
+        err_ret = sections.front().members.front().element;
+    }
+
     if(sec == "") {
         sec = "Main";
     }
     if(!has_section(sec)) {
         err = IniError::READ_ERROR;
         err_desc = "Unable to get not existing variable: " + key + " in not existing section " + sec + " !";
-        return sections.front().members.front().element;
+        return err_ret;
     }
 
     auto& s = section(sec);
@@ -273,7 +279,7 @@ IniElement& IniFile::get(std::string key, std::string sec) {
 
     err = IniError::READ_ERROR;
     err_desc = "Unable to get not existing variable: " + key + " in " + sec + " !";
-    return sections.front().members.front().element;
+    return err_ret;
 }
 
 IniSection& IniFile::section(std::string name) {
