@@ -43,10 +43,12 @@ These types will be checked for the user. <br>
 <br>
 <br>
 Warning! something like:
+
 ```ini
 [Section]
 a=b
 ```
+
 shoudln't work, because `b` is not a known type. It should be `"b"`! <br>
 Luckily, Ini++ already handles this case for you. <br>
 `b` would be turned to `"b"`. But be careful! `1` will always be an `int`, even when it was intended to be a string!
@@ -59,7 +61,7 @@ A possible list is:
 ```
 [10,"hello",(12,56,89),[sublist,12]]
 ```
-A list can hold any type, also sublist work. <br>
+A list can hold any type, also sublists work. <br>
 `IniList` is defined as `std::vector<IniElement>`.
 
 ### Dictionary
