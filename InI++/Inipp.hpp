@@ -15,6 +15,7 @@ enum class IniType {
     Float,
     Vector,
     Dictionary,
+    Link
 };
 
 inline std::string IniType2str(IniType type) {
@@ -26,6 +27,7 @@ inline std::string IniType2str(IniType type) {
 
 // Not a type but container for any type
 class IniElement;
+class IniFile;
 using IniDictionary     IS_INI_TYPE  =  std::map<std::string,IniElement>;
 using IniList           IS_INI_TYPE  =  std::vector<IniElement>;
 struct IniVector        IS_INI_TYPE 
@@ -38,8 +40,9 @@ struct IniVector        IS_INI_TYPE
         z = v.z;
     }
 
-    std::string to_string() const { return "(" + std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z) + ")"; }
+    inline std::string to_string() const { return "(" + std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z) + ")"; }
 };
+struct IniLink          IS_INI_TYPE;
 
 namespace IniHelper {
     void set_type(IniElement& obj, IniType type);
@@ -53,7 +56,9 @@ namespace IniHelper {
     // @exception will return IniElement() (aka Null)
     IniElement to_element(std::string src);
 
-    
+    IniLink make_link(std::string to, std::string section, IniFile& file);
+    IniLink make_link(std::string src, IniFile& file);
+
 
     namespace tls {
         std::vector<std::string> split_by(std::string str,std::vector<char> erase, std::vector<char> keep = {}, std::vector<char> extract = {}, bool ignore_in_braces = false, bool delete_empty = true);
@@ -95,14 +100,21 @@ public:
     IniVector to_vector() const;
     IniList to_list() const;
     IniDictionary to_dictionary() const;
+    IniLink to_link(IniFile& file) const;
 
     static IniElement from_vector(IniVector vec);
     static IniElement from_list(IniList list);
     static IniElement from_dictionary(IniDictionary dictionary);
 
+    bool is_link() const;
+
     IniElement operator=(IniList list);
     IniElement operator=(IniVector vector);
     IniElement operator=(IniDictionary dictionary);
+    IniElement operator=(IniElement element);
+    IniElement operator=(std::string str);
+    IniElement operator=(int integer);
+    IniElement operator=(float floatp);
 
     operator IniList();
     operator IniVector();
@@ -173,6 +185,10 @@ public:
     void set(std::string key, IniDictionary value, std::string section = "Main");
     void set(std::string key, IniVector value, std::string section = "Main");
 
+    void set(std::string key, std::string value, std::string section = "Main");
+    void set(std::string key, int value, std::string section = "Main");
+    void set(std::string key, float value, std::string section = "Main");
+
     IniFile(std::string file) {
         operator=(from_file(file));
     }
@@ -180,5 +196,23 @@ public:
     IniFile() {}
 };
 
+class IniLink
+{ // a read only pointer to another element
+    IniFile* last;
+    std::string build;
+    IniElement source;
+    void construct(IniFile file);
+public:
+    void refresh(IniFile file);
+    IniElement get();
+    IniElement getr();
+    IniElement getr(IniFile& file);
+    IniLink(std::string src) : build(src) { }
+
+    static bool valid(std::string str);
+
+    IniElement operator*();
+    operator IniElement();
+};
 
 #endif

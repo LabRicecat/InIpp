@@ -7,12 +7,12 @@ This implemention is written in C++.
 ## Sections
 Every value has to be in a section. <br>
 A section is defined as this:
-```
+```ini
 [SectionName]
 ```
 Spaces are supported, but not recomended! <br>
 Now the key-value pairs can be added:
-```
+```ini
 [Section]
 key="value"
 int=1245
@@ -20,7 +20,7 @@ float=6.27
 ...
 ```
 When pairs are not in a section, like this:
-```
+```ini
 a="b"
 [Section]
 ...
@@ -36,7 +36,8 @@ Known types are:
  - Float
  - Vector
  - List
- - Dictionary <br>
+ - Dictionary
+ - Link <br> <br>
 As defined in `IniTypes`.
 <br>
 These types will be checked for the user. <br>
@@ -58,7 +59,7 @@ As defined in the `IniElement` class, it's a storage class for every known type.
 ### List
 A list begins and ends with `[]`. <br>
 A possible list is:
-```
+```json
 [10,"hello",(12,56,89),[sublist,12]]
 ```
 A list can hold any type, also sublists work. <br>
@@ -67,7 +68,7 @@ A list can hold any type, also sublists work. <br>
 ### Dictionary
 A dictionary begins and ends with `{}` <br>
 A possible dictionary is:
-```
+```json
 {key:value,41:"string",K:[list]}
 ```
 A key has always to be a string or a number. The value can be any `IniType` <br>
@@ -77,11 +78,20 @@ A key has always to be a string or a number. The value can be any `IniType` <br>
 A vector begins and ends with `()` <br>
 It has three values: `x`,`y` and `z`. Everyone is an int. <br>
 A possible vector would be:
-```
+```json
 (14,685432,1279)
 ```
 Floats are not yet supported. <br>
 `IniVector` is defined as `struct IniVector { ... };`
+
+### Link
+A link links to another key. <br>
+A possible link is:
+```
+$key:section
+```
+`key` is the key to which the link links to and `section` is the section `key` is in. <br>
+If no section is given, "Main" is assumed.
 
 ## How to use
 An example: (C++)
@@ -111,11 +121,19 @@ int main() {
 
     IniList list = file.get("list","section_b"); // if not a list, returns empty list and sets error()
     IniDictionary dictionary = file.get("dictionary","section_b"); // if not a dictionary, returns empty dictionary and sets error()
+    IniElement string = file.get("string","section_c");
+
+    if(string.getType() != IniType::String) {
+        // Not a string!
+    }
 
     dictionary["key"] = list.back(); // sets key to the last element in the list
     list.pop_back(); // deletes the last element
 
-    
+    string = "Hello, World!"; // Set values using the = operator
+    std::cout << string.to_string() << "\n"; // Output: "Hello, World!"
+    std::cout << (std::string)string << "\n"; // Output: Hello, World!
+
     // writes everything back
     file.set("list",list,"section_b");
     file.set("dictionary",dictionary,"section_b");
@@ -126,6 +144,7 @@ int main() {
 ```
 
 ### Inipp itself
+Here an example:
 ```ini
 [Section]
 key="value"
@@ -136,4 +155,5 @@ float=67.2456
 list=["element1","element2",2744]
 dict={key:"value",wow:["such","cool"]}
 vector3=(1,23,456)
+link=$key:Section
 ```

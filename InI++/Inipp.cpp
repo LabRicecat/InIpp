@@ -328,6 +328,18 @@ void IniFile::set(std::string key, IniVector value, std::string section) {
     IniFile::set(key,IniElement(IniType::Vector,IniHelper::to_string(value)),section);
 }
 
+void IniFile::set(std::string key, std::string value, std::string section) {
+    IniFile::set(key,IniElement(IniType::String,"\"" + value + "\""),section);
+}
+
+void IniFile::set(std::string key, int value, std::string section) {
+    IniFile::set(key,IniElement(IniType::Int,std::to_string(value)),section);
+}
+
+void IniFile::set(std::string key, float value, std::string section) {
+    IniFile::set(key,IniElement(IniType::Float,std::to_string(value)),section);
+}
+
 // IniSection
 
 
@@ -381,6 +393,10 @@ IniDictionary IniElement::to_dictionary() const {
     return IniHelper::to_dictionary(src);
 }
 
+IniLink IniElement::to_link(IniFile& file) const {
+    return IniHelper::make_link(src,file);
+}
+
 IniElement IniElement::from_vector(IniVector vec) {
     return IniElement(IniType::Vector,vec.to_string());
 }
@@ -393,20 +409,52 @@ IniElement IniElement::from_dictionary(IniDictionary dictionary) {
     return IniElement(IniType::Dictionary,IniHelper::to_string(dictionary));
 }
 
+bool IniElement::is_link() const {
+    return IniLink::valid(src);
+}
+
 IniElement IniElement::operator=(IniList list) {
     src = IniHelper::to_string(list);
+    type = IniType::List;
     return *this;
 }
 
 IniElement IniElement::operator=(IniVector vector) {
     src = IniHelper::to_string(vector);
+    type = IniType::Vector;
     return *this;
 }
 
 IniElement IniElement::operator=(IniDictionary dictionary) {
     src = IniHelper::to_string(dictionary);
+    type = IniType::Dictionary;
     return *this;
 }
+
+IniElement IniElement::operator=(IniElement element) {
+    src = element.to_string();
+    type = element.type;
+    return *this;
+}
+
+IniElement IniElement::operator=(std::string str) {
+    src = "\"" + str + "\"";
+    type = IniType::String;
+    return *this;
+}
+
+IniElement IniElement::operator=(int integer) {
+    src = std::to_string(integer);
+    type = IniType::Int;
+    return *this;
+}
+
+IniElement IniElement::operator=(float floatp) {
+    src = std::to_string(floatp);
+    type = IniType::Float;
+    return *this;
+}
+
 
 IniElement::operator IniList() {
     return IniHelper::to_list(src);
@@ -433,6 +481,75 @@ std::ostream& operator<<(std::ostream& os, IniElement element) {
     
     os << pr;
     return os;
+}
+
+// IniLink
+void IniLink::construct(IniFile file) {
+    std::string b = build;
+    b.erase(b.begin());
+
+    int p = -1;
+
+    for(size_t i = 0; i < b.size(); ++i) {
+        if(b[i] == ':') {
+            p = i;
+            break;
+        }
+    }
+
+    if(p == b.size()-1 && p == 0) {
+        return;
+    }
+    
+    std::string key;
+    std::string section;
+
+    if(p == -1) {
+        key = b;
+        section = "Main";
+    }
+    else {
+        key = b.substr(0,p);
+        section = b.substr(p+1,b.size()-1);
+    }
+    if(file.has(key,section)) {
+        source = file.get(key,section);
+    }
+    else {
+        return;
+    }
+}
+
+bool IniLink::valid(std::string str) {
+    return (str.size() > 2 && str[0] == '$');
+}
+
+void IniLink::refresh(IniFile file) {
+    if(valid(build)) {
+        construct(file);
+    }
+}
+
+IniElement IniLink::get() {
+    return source;
+}
+
+IniElement IniLink::getr() {
+    return getr(*last);
+}
+
+IniElement IniLink::getr(IniFile& file) {
+    refresh(file);
+    last = &file;
+    return get();
+}
+
+IniLink::operator IniElement() {
+    return IniElement(IniType::Link,build);
+}
+
+IniElement IniLink::operator*() {
+    return source;
 }
 
 // IniHelper namespace
@@ -507,6 +624,8 @@ void IniHelper::set_type(IniElement& obj, IniType type) {
         case IniType::Vector:
             obj = IniElement(type,"(0,0,0)");
         break;
+        case IniType::Link:
+            obj = IniLink("$null:Main");
         default:
             obj = IniElement(type,"NULL");
     }
@@ -625,6 +744,10 @@ IniElement IniHelper::to_element(std::string source) {
         return IniElement(IniType::Vector,source);
     }
 
+    if(IniLink::valid(source)) {
+        return IniElement(IniType::Link,source);
+    }
+
     bool has = false;
     for(auto i : source) {
         if(i == '\"') {
@@ -640,6 +763,19 @@ IniElement IniHelper::to_element(std::string source) {
     return IniElement();
 }
 
+IniLink IniHelper::make_link(std::string to, std::string section, IniFile& file) {
+    IniLink lk("$" + to + ":" + section);
+    //lk.refresh(file);
+    lk.getr(file);
+    return lk;
+}
+
+IniLink IniHelper::make_link(std::string src, IniFile& file) {
+    IniLink lk(src);
+    //lk.refresh(file);
+    lk.getr(file);
+    return lk;
+}
 
 std::string IniHelper::to_string(IniList list) {
     std::string ret = "[";

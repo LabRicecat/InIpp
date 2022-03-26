@@ -3,5 +3,7 @@ test.txt
 test.ini
 IniTest.x86_64
 src/main.cpp
+main.cpp
 src/
 *.inipp
+*.ini++
