@@ -59,7 +59,7 @@ As defined in the `IniElement` class, it's a storage class for every known type.
 ### List
 A list begins and ends with `[]`. <br>
 A possible list is:
-```json
+```
 [10,"hello",(12,56,89),[sublist,12]]
 ```
 A list can hold any type, also sublists work. <br>
@@ -68,7 +68,7 @@ A list can hold any type, also sublists work. <br>
 ### Dictionary
 A dictionary begins and ends with `{}` <br>
 A possible dictionary is:
-```json
+```
 {key:value,41:"string",K:[list]}
 ```
 A key has always to be a string or a number. The value can be any `IniType` <br>
@@ -78,7 +78,7 @@ A key has always to be a string or a number. The value can be any `IniType` <br>
 A vector begins and ends with `()` <br>
 It has three values: `x`,`y` and `z`. Everyone is an int. <br>
 A possible vector would be:
-```json
+```
 (14,685432,1279)
 ```
 Floats are not yet supported. <br>
