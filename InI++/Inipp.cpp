@@ -207,7 +207,7 @@ IniFile IniFile::from_file(std::string file) {
         else {
             std::string left;
             std::string right;
-            auto split = IniHelper::tls::split_by(lines[i],{' '},{},{'='},true,true);
+            auto split = IniHelper::tls::split_by(lines[i],{},{},{'='},true,true);
 
             if(split.size() != 3 || split[1] != "=") {
                 ret.err = IniError::SYNTAX_ERROR; 
