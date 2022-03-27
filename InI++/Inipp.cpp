@@ -254,6 +254,13 @@ std::string IniFile::error_msg() const {
     return err_desc;
 }
 
+bool IniFile::clearerr() {
+    bool r = err == IniError::OK;
+    err = IniError::OK;
+    err_desc = "";
+    return r;
+}
+
 IniElement& IniFile::get(std::string key, std::string sec) {
     IniElement invalid_ref;
     IniElement& err_ret = invalid_ref;
@@ -409,8 +416,20 @@ IniElement IniElement::from_dictionary(IniDictionary dictionary) {
     return IniElement(IniType::Dictionary,IniHelper::to_string(dictionary));
 }
 
+bool IniElement::is_list() const {
+    return type == IniType::List;
+}
+
+bool IniElement::is_dictionary() const {
+    return type == IniType::Dictionary;
+}
+
+bool IniElement::is_vector() const {
+    return type == IniType::Vector;
+}
+
 bool IniElement::is_link() const {
-    return IniLink::valid(src);
+    return IniLink::valid(src) && type == IniType::Link;
 }
 
 IniElement IniElement::operator=(IniList list) {
@@ -484,7 +503,7 @@ std::ostream& operator<<(std::ostream& os, IniElement element) {
 }
 
 // IniLink
-void IniLink::construct(IniFile file) {
+void IniLink::construct(IniFile& file) {
     std::string b = build;
     b.erase(b.begin());
 
@@ -524,8 +543,9 @@ bool IniLink::valid(std::string str) {
     return (str.size() > 2 && str[0] == '$');
 }
 
-void IniLink::refresh(IniFile file) {
+void IniLink::refresh(IniFile& file) {
     if(valid(build)) {
+        last = &file;
         construct(file);
     }
 }
@@ -540,7 +560,7 @@ IniElement IniLink::getr() {
 
 IniElement IniLink::getr(IniFile& file) {
     refresh(file);
-    last = &file;
+    // last = &file; <- already in refresh()
     return get();
 }
 

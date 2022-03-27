@@ -45,6 +45,7 @@ struct IniVector        IS_INI_TYPE
 struct IniLink          IS_INI_TYPE;
 
 namespace IniHelper {
+    // Sets OBJ to and empty version of TYPE
     void set_type(IniElement& obj, IniType type);
 
     // @exception will return IniDictionary()
@@ -57,6 +58,7 @@ namespace IniHelper {
     IniElement to_element(std::string src);
 
     IniLink make_link(std::string to, std::string section, IniFile& file);
+    // Section is "Main"
     IniLink make_link(std::string src, IniFile& file);
 
 
@@ -85,33 +87,67 @@ class IniElement {
 public:
     IniType getType() const;
 
-    IniElement(IniType type, std::string src) 
-        : type(type), src(src) {}
+    IniElement(IniType type, std::string src) // unsave, don't use if you don't know what you are doing!
+        : type(type), src(src) { } 
     
+    // Warning! This doesn't construct a string for you! It will check what construct type it is. so "12" is NOT a string but an int!
+    // Use operator=(std::string) instead!
+    IniElement(std::string src) // always use this to constructfrom a type!
+         { this->src = IniHelper::to_element(src).src; }
+
     IniElement(IniType type) 
-        : type(type), src("") {}
+        { IniHelper::set_type(*this,type); }
     
+    IniElement(int integer)
+        : type(IniType::Int), src(std::to_string(integer)) { }
+    
+    IniElement(float floatp)
+        : type(IniType::Float), src(std::to_string(floatp)) { }
+    
+    IniElement(IniList list)
+        { operator=(list); }
+    
+    IniElement(IniDictionary dictionary)
+        { operator=(dictionary); }
+
+    IniElement(IniVector vector)
+        { operator=(vector); }
+
     //IniElement(IniElement& element) 
     //    : type(element.type), src(element.src) {}
     
     IniElement() {}
 
+    // returns the construction string
     std::string to_string() const;
+    // returns IniVector() on error
     IniVector to_vector() const;
+    // returns IniList() on error
     IniList to_list() const;
+    // returns IniDictionary() on error
     IniDictionary to_dictionary() const;
+    // returns a broken link on error
     IniLink to_link(IniFile& file) const;
 
     static IniElement from_vector(IniVector vec);
     static IniElement from_list(IniList list);
     static IniElement from_dictionary(IniDictionary dictionary);
 
+    // checks only the type
+    bool is_list() const;
+    // checks only the type
+    bool is_dictionary() const;
+    // checks only the type
+    bool is_vector() const;
+    // doesnt just return type == IniType::Link
+    // also checks with IniLink::is_valid() !
     bool is_link() const;
 
     IniElement operator=(IniList list);
     IniElement operator=(IniVector vector);
     IniElement operator=(IniDictionary dictionary);
     IniElement operator=(IniElement element);
+    // This, other then IniElement(std::string), constructs a string!
     IniElement operator=(std::string str);
     IniElement operator=(int integer);
     IniElement operator=(float floatp);
@@ -166,14 +202,22 @@ public:
     bool has(std::string key) const;
     bool has(std::string key, std::string section) const;
     bool has_section(std::string section) const;
+
+    // Writes all sections into the file.
+    // Might fail and set error() & error_msg()
     IniError to_file(std::string file);
 
+    // Use IniFile::from_file() when you know that the file already exists.
+    // Use IniFile(std::string) when you want the fire beeing constructed if it doesn't exist
     static IniFile from_file(std::string file);
 
     void operator=(IniFile file);
     operator bool();
     IniError error() const;
     std::string error_msg() const;
+
+    // Returns true if the IniFile failed before the clear.
+    bool clearerr();
 
     // @exception will return sections.front().members.front().element and sets err/err_desc
     IniElement& get(std::string key, std::string section = "Main");
@@ -201,11 +245,14 @@ class IniLink
     IniFile* last;
     std::string build;
     IniElement source;
-    void construct(IniFile file);
+    void construct(IniFile& file);
 public:
-    void refresh(IniFile file);
+    // refreshes
+    void refresh(IniFile& file);
     IniElement get();
+    // calls also `reload` with the last used IniFile
     IniElement getr();
+    // calls also `reload()`
     IniElement getr(IniFile& file);
     IniLink(std::string src) : build(src) { }
 
