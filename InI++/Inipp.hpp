@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <optional>
 
 #define IS_INI_TYPE //marks which is a type and which is not
 
@@ -220,7 +221,7 @@ public:
     bool clearerr();
 
     // @exception will return sections.front().members.front().element and sets err/err_desc
-    IniElement& get(std::string key, std::string section = "Main");
+    std::optional<IniElement&> get(std::string key, std::string section = "Main");
     // @exception will return sections.front() and sets err/err_desc
     IniSection& section(std::string name);
 
@@ -233,11 +234,17 @@ public:
     void set(std::string key, int value, std::string section = "Main");
     void set(std::string key, float value, std::string section = "Main");
 
+    void construct(std::string key, std::string source, std::string section = "Main");
+
     IniFile(std::string file) {
         operator=(from_file(file));
     }
 
     IniFile() {}
+    // checks if `elem` is a IniLink, and if yes, returns it's value.
+    IniElement operator[](IniElement elem);
+    // Also sets `last` from `link`
+    IniElement operator[](IniLink link);
 };
 
 class IniLink

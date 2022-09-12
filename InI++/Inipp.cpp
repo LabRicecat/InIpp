@@ -260,8 +260,9 @@ bool IniFile::clearerr() {
     err_desc = "";
     return r;
 }
+#include <optional>
 
-IniElement& IniFile::get(std::string key, std::string sec) {
+std::optional<IniElement&> IniFile::get(std::string key, std::string sec) {
     IniElement invalid_ref;
     IniElement& err_ret = invalid_ref;
     if(!sections.empty() && !sections.front().members.empty()) {
@@ -345,6 +346,23 @@ void IniFile::set(std::string key, int value, std::string section) {
 
 void IniFile::set(std::string key, float value, std::string section) {
     IniFile::set(key,IniElement(IniType::Float,std::to_string(value)),section);
+}
+
+void IniFile::construct(std::string key, std::string source, std::string section) {
+    IniFile::set(key,IniElement(source),section);
+}
+
+IniElement IniFile::operator[](IniElement elem) {
+    std::cout << IniType2str(elem.getType()) << "\n";
+    if(elem.is_link()) {
+        IniLink nlk = elem.to_link(*this);
+        return nlk.getr(*this);
+    }
+    return elem;
+}
+
+IniElement IniFile::operator[](IniLink link) {
+    return link.getr(*this);
 }
 
 // IniSection
