@@ -221,7 +221,7 @@ public:
     bool clearerr();
 
     // @exception will return sections.front().members.front().element and sets err/err_desc
-    std::optional<IniElement&> get(std::string key, std::string section = "Main");
+    IniElement& get(std::string key, std::string section = "Main");
     // @exception will return sections.front() and sets err/err_desc
     IniSection& section(std::string name);
 

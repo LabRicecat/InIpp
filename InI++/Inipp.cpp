@@ -262,20 +262,14 @@ bool IniFile::clearerr() {
 }
 #include <optional>
 
-std::optional<IniElement&> IniFile::get(std::string key, std::string sec) {
-    IniElement invalid_ref;
-    IniElement& err_ret = invalid_ref;
-    if(!sections.empty() && !sections.front().members.empty()) {
-        err_ret = sections.front().members.front().element;
-    }
-
+IniElement& IniFile::get(std::string key, std::string sec) {
     if(sec == "") {
         sec = "Main";
     }
     if(!has_section(sec)) {
         err = IniError::READ_ERROR;
         err_desc = "Unable to get not existing variable: " + key + " in not existing section " + sec + " !";
-        return err_ret;
+        return sections.front().members.front().element;;
     }
 
     auto& s = section(sec);
@@ -287,7 +281,7 @@ std::optional<IniElement&> IniFile::get(std::string key, std::string sec) {
 
     err = IniError::READ_ERROR;
     err_desc = "Unable to get not existing variable: " + key + " in " + sec + " !";
-    return err_ret;
+    return sections.front().members.front().element;;
 }
 
 IniSection& IniFile::section(std::string name) {

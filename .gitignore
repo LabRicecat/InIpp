@@ -5,5 +5,5 @@ IniTest.x86_64
 src/main.cpp
 main.cpp
 src/
-*.inipp
 *.ini++
+out.txt
