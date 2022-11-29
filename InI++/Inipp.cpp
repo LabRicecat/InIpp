@@ -754,6 +754,8 @@ IniElement IniHelper::to_element(std::string source) {
         return IniElement(IniType::Null,"NULL");
     }
     if(source.front() == '"' && source.back() == '"') {
+        source.erase(source.begin());
+        source.erase(source.end()-1);
         return IniElement(IniType::String,source);
     }
     
