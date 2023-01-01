@@ -276,11 +276,10 @@ public:
     std::vector<IniSection> sections;
 
     bool has(std::string key) const {
-        for(auto i : sections) 
-            if(i.has(key)) return true;    
-        return false;
+        return has(key,"");
     }
     bool has(std::string key, std::string section) const {
+        if(section == "") section = "Main";
         for(auto i : sections) 
             if(i.has(key) && i.name == section) return true;
         return false;
