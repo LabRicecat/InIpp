@@ -198,7 +198,7 @@ public:
         type = IniType::Int;
         return *this;
     }
-    inline IniElement operator=(float floatp) {
+    inline IniElement operator=(long double floatp) {
         src = std::to_string(floatp);
         type = IniType::Float;
         return *this;
@@ -207,7 +207,10 @@ public:
     inline operator IniList() { return IniHelper::to_list(src); }
     inline operator IniVector() { return IniHelper::to_vector(src); }
     inline operator IniDictionary() { return IniHelper::to_dictionary(src); }
-    inline operator std::string() { return src; }
+    inline operator std::string() { 
+        if(type == IniType::String) return src.substr(1,src.size()-2);
+        return src;
+    }
 };
 
 inline std::ostream &operator<<(std::ostream& os, IniElement element) {
@@ -325,6 +328,7 @@ public:
             .add_backslashopt('n','\n')
             .add_backslashopt('r','\r')
             .add_backslashopt('\\','\\')
+            .add_backslashopt('"','"')
             .add_ignore(' ')
             .add_ignore('\t')
             .add_linebreak('\n')
@@ -446,7 +450,7 @@ public:
 
     inline void set(std::string key, std::string value, std::string section = "Main") { get(key,section) = value; }
     inline void set(std::string key, int value, std::string section = "Main") { get(key,section) = value; }
-    inline void set(std::string key, float value, std::string section = "Main") { get(key,section) = value; }
+    inline void set(std::string key, long double value, std::string section = "Main") { get(key,section) = value; }
 
     inline void construct(std::string key, std::string source, std::string section = "Main") {
         IniFile::set(key,IniElement(source),section);
