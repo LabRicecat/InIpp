@@ -2,7 +2,7 @@
 
 [Info]
 name="inipp"
-version="1.4.3"
+version="1.4.4"
 
 [Download]
 dependencies=["catcaretaker/kittenlexer"]
