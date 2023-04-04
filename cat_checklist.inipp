@@ -1,10 +1,10 @@
 [Main]
 
 [Info]
-name="inipp"
-version="1.4.4"
+name = "inipp"
+version = "1.4.4"
 
 [Download]
-dependencies=["catcaretaker/kittenlexer"]
-files=["inipp.hpp"]
+dependencies = ["https://raw.githubusercontent.com/catcaretaker/kittenlexer/main/"]
+files = ["inipp.hpp"]
 

@@ -7,9 +7,9 @@
 #include <fstream>
 #include <iostream>
 
-#include "catmods/kittenlexer/kittenlexer.hpp"
+#include "catpkgs/kittenlexer/kittenlexer.hpp"
 
-#define IS_INI_TYPE //marks which is a type and which is not
+#define IS_INI_TYPE // marks which is a type and which is not
 
 enum class IniType {
     Null,
@@ -187,7 +187,7 @@ public:
         return *this;
     }
     
-    // This, other then IniElement(std::string), constructs a string!
+    // This, other than IniElement(std::string), constructs a string!
     inline IniElement operator=(std::string str) {
         for(size_t i = 0; i < str.size(); ++i)
             if(str[i] == '\"') {
@@ -267,7 +267,7 @@ struct IniSection {
         for(auto& i : members) 
             if(i.key == key) return i.element;
         
-        members.push_back(IniPair(key)); // creates new key
+        members.push_back(IniPair(key)); // creates a new key
         return members.back().element;
     }
 
@@ -318,8 +318,6 @@ public:
         f << write; f.close();
     }
 
-    // Use IniFile::from_file() when you know that the file already exists.
-    // Use IniFile(std::string) when you want the fire beeing constructed if it doesn't exist
     static IniFile from_file(std::string file) {
         IniFile ret;
         ret.sections.push_back(IniSection("Main"));
