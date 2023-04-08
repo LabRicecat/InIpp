@@ -1,12 +1,3 @@
 .vscode
-test.txt
-test.ini
-IniTest.x86_64
-src/main.cpp
-main.cpp
-src/
-*.ini++
-out.txt
-test.inipp
-catmods/
-a.out
+*.cpp
+catpkgs/
