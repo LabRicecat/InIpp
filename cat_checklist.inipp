@@ -5,6 +5,6 @@ name = "inipp"
 version = "1.4.4"
 
 [Download]
-dependencies = ["https://raw.githubusercontent.com/catcaretaker/kittenlexer/main/"]
+dependencies = ["https://raw.githubusercontent.com/labricecat/kittenlexer/main/"]
 files = ["inipp.hpp"]
 
