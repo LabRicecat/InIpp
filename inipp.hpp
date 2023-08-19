@@ -121,7 +121,7 @@ public:
     IniElement(int integer)
         : type(IniType::Int), src(std::to_string(integer)) { }
     
-    IniElement(float floatp)
+    IniElement(long double floatp)
         : type(IniType::Float), src(std::to_string(floatp)) { }
     
     IniElement(IniList list)
@@ -156,6 +156,8 @@ public:
     static IniElement from_dictionary(IniDictionary dictionary) 
     { return IniElement(IniType::Dictionary,IniHelper::to_string(dictionary)); }
 
+    inline bool is_int() const { return type == IniType::Int; }
+    inline bool is_float() const { return type == IniType::Float; }
     // checks only the type
     inline bool is_list() const { return type == IniType::List; }
     // checks only the type
@@ -166,29 +168,29 @@ public:
     // also checks with IniLink::is_valid() !
     inline bool is_link() const; /*{ return type == IniType::Link && IniLink::valid(src); }*/
 
-    inline IniElement operator=(IniList list) {
+    inline IniElement& operator=(IniList list) {
         src = IniHelper::to_string(list);
         type = IniType::List;
         return *this;
     }
-    inline IniElement operator=(IniVector vector) {
+    inline IniElement& operator=(IniVector vector) {
         src = IniHelper::to_string(vector);
         type = IniType::Vector;
         return *this;
     }
-    inline IniElement operator=(IniDictionary dictionary) {
+    inline IniElement& operator=(IniDictionary dictionary) {
         src = IniHelper::to_string(dictionary);
         type = IniType::Dictionary;
         return *this;
     }
-    inline IniElement operator=(IniElement element) {
+    inline IniElement& operator=(IniElement element) {
         src = element.to_string();
         type = element.type;
         return *this;
     }
     
     // This, other than IniElement(std::string), constructs a string!
-    inline IniElement operator=(std::string str) {
+    inline IniElement& operator=(std::string str) {
         for(size_t i = 0; i < str.size(); ++i)
             if(str[i] == '\"') {
                 str.insert(str.begin()+i,'\\');
@@ -223,6 +225,12 @@ public:
             return src.substr(1,src.size()-2);
         }
         return src;
+    }
+    inline operator int() {
+        return std::stoi(src);
+    }
+    explicit inline operator long double() {
+        return std::stod(src);
     }
 };
 
