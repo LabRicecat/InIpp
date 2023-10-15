@@ -1,3 +1,7 @@
+# !! MOVED TO CODEBERG.ORG !!
+**This is an old version, please visit the current version at [codeberg.org](https://codeberg.org/LabRicecat/inipp)!**
+
+
 # InIpp
 Ini++ (Or InIpp) is just normal InI, but with changes and additions. <br>
 This implemention is written in C++.
